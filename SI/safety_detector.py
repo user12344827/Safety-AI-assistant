@@ -14,8 +14,12 @@ class SafetyDetector:
         self.model_path = model_path
         self.save_dir = save_dir
         
-        # 創建保存目錄（如果不存在）
-        os.makedirs(save_dir, exist_ok=True)
+        # 檢查並確保保存目錄存在
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+            print(f"創建檢測結果目錄: {save_dir}")
+        else:
+            print(f"使用已存在的檢測結果目錄: {save_dir}")
     
     def detect_objects(self, image_path):
         """
@@ -37,44 +41,30 @@ class SafetyDetector:
         # 進行物件檢測
         results = model(image)
         
-        # 保存檢測結果圖片
-        results.save(save_dir=self.save_dir)
+        # 保存檢測結果圖片，使用覆蓋模式
+        results.save(save_dir=self.save_dir, exist_ok=True)  # 允許覆蓋已存在的檔案
         
         # 獲取檢測詳細結果
         detections = results.pandas().xyxy[0]
         
-        # 分析安全狀態
+        # 分析安全狀態 - 新增事件原因欄位
         safety_status = {
             'file_name': os.path.basename(image_path),
             'has_person': False,
-            'has_helmet': False,
-            'risk_level': '一般',
             'event_type': '一般',
-            'detection_details': []
+            'event_reason': ''
         }
         
+        # 檢查是否有人員
         for _, detection in detections.iterrows():
-            object_class = detection['name']
-            confidence = detection['confidence']
-            
-            # 記錄檢測到的物件詳情
-            safety_status['detection_details'].append({
-                'class': object_class,
-                'confidence': confidence
-            })
-            
-            # 檢查是否有人員
-            if object_class == 'person':
+            if detection['name'] == 'person':
                 safety_status['has_person'] = True
-            
-            # 檢查是否有安全帽
-            if object_class == 'helmet':
-                safety_status['has_helmet'] = True
+                break
         
-        # 判斷危險等級和事件類型
-        if safety_status['has_person'] and not safety_status['has_helmet']:
-            safety_status['risk_level'] = '危險'
-            safety_status['event_type'] = '未戴安全帽'
+        # 修改後的判斷邏輯：只要有人就標記為危險事件，並加入事件原因
+        if safety_status['has_person']:
+            safety_status['event_type'] = '危險'
+            safety_status['event_reason'] = '未戴安全帽'
         
         return detections, safety_status
     
@@ -87,9 +77,14 @@ class SafetyDetector:
         """
         print(f"總共檢測到 {len(detections)} 個物件")
         
-        # 顯示每個檢測物件的類別和置信度
-        for i, detection in detections.iterrows():
-            print(f"物件 {i+1}: 類別={detection['name']}, 置信度={detection['confidence']:.4f}")
+        # 顯示每個檢測物件的類別
+        class_counts = {}
+        for _, detection in detections.iterrows():
+            class_name = detection['name']
+            class_counts[class_name] = class_counts.get(class_name, 0) + 1
+        
+        for class_name, count in class_counts.items():
+            print(f"檢測到 {count} 個 {class_name}")
 
 
 # 使用範例
@@ -109,6 +104,6 @@ if __name__ == "__main__":
     print("\n安全狀態:")
     print(f"文件名稱: {safety_status['file_name']}")
     print(f"檢測到人員: {'是' if safety_status['has_person'] else '否'}")
-    print(f"檢測到安全帽: {'是' if safety_status['has_helmet'] else '否'}")
-    print(f"風險等級: {safety_status['risk_level']}")
     print(f"事件類型: {safety_status['event_type']}")
+    if safety_status['event_type'] == '危險':
+        print(f"事件原因: {safety_status['event_reason']}")

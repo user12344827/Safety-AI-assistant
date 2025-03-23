@@ -6,19 +6,27 @@ def main():
     """主程式：結合安全帽檢測和圖像管理功能"""
     print("===== 工地安全帽檢測與記錄系統 =====")
     
-    # 初始化檢測器和圖像管理器
-    detector = SafetyDetector()
-    image_manager = SafetyImageManager()
-    
-    # 設定需要處理的圖片目錄
+    # 設定需要處理的圖片目錄和檢測結果目錄
     image_dir = './images'
+    detection_results_dir = './detection_results'
     
-    # 檢查目錄是否存在
+    # 檢查圖片目錄是否存在
     if not os.path.exists(image_dir):
         print(f"圖片目錄 '{image_dir}' 不存在，正在創建...")
         os.makedirs(image_dir)
         print(f"請將要分析的圖片放入 '{image_dir}' 目錄中，然後重新執行程式")
         return
+    
+    # 確保檢測結果目錄存在，如果不存在則創建
+    if not os.path.exists(detection_results_dir):
+        print(f"檢測結果目錄 '{detection_results_dir}' 不存在，正在創建...")
+        os.makedirs(detection_results_dir)
+    else:
+        print(f"使用已存在的檢測結果目錄: '{detection_results_dir}'")
+    
+    # 初始化檢測器和圖像管理器
+    detector = SafetyDetector(save_dir=detection_results_dir)
+    image_manager = SafetyImageManager()
     
     # 獲取目錄中的所有圖片
     image_files = [f for f in os.listdir(image_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
@@ -45,8 +53,8 @@ def main():
             image_manager.add_safety_record(file_name, safety_status)
             
             # 打印安全狀態
-            if safety_status['risk_level'] == '危險':
-                print(f"⚠️ 警告: 圖片 {file_name} 中檢測到安全問題 - {safety_status['event_type']}")
+            if safety_status['event_type'] == '危險':
+                print(f"⚠️ 警告: 圖片 {file_name} 中檢測到安全問題 - {safety_status['event_reason']}")
             else:
                 print(f"✓ 圖片 {file_name} 安全檢查通過")
                 
@@ -59,9 +67,9 @@ def main():
     print("\n安全檢測記錄摘要:")
     image_manager.display_all_records()
     
-    # 過濾危險記錄
-    print("\n危險事件記錄:")
-    image_manager.filter_by_risk()
+    # 過濾特定原因的記錄
+    print("\n未戴安全帽事件記錄:")
+    image_manager.filter_by_reason('未戴安全帽')
 
 
 if __name__ == "__main__":
