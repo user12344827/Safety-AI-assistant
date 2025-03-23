@@ -2,7 +2,7 @@ import torch
 from PIL import Image
 import os
 
-def detect_objects(image_path, model_path='./weights/best.pt', save_dir='./ph_result'):
+def detect_objects(image_path, model_path='./model/best.pt', save_dir='./ph_result'):
     """
     使用自訓練的YOLO模型檢測圖片中的物件
     
@@ -51,7 +51,7 @@ def print_detection_results(detections):
 # 範例使用方式
 if __name__ == "__main__":
     # 基本用法
-    results, detections = detect_objects('test1.jpg')
+    results, detections = detect_objects('test2.jpg')
     
     # 顯示檢測結果
     results.show()
