@@ -27,8 +27,11 @@ def detect_objects(image_path, model_path='./weights/best.pt', save_dir='./ph_re
     # 創建保存目錄（如果不存在）
     os.makedirs(save_dir, exist_ok=True)
     
-    # 保存檢測結果影像到文件
-    results.save(save_dir=save_dir)
+    # 直接保存到指定目錄，不讓Ultralytics自動創建子目錄
+    for i, img in enumerate(results.ims):
+        img_name = os.path.basename(image_path) if i == 0 else f"{i}_{os.path.basename(image_path)}"
+        save_path = os.path.join(save_dir, img_name)
+        Image.fromarray(img).save(save_path)
     
     # 獲取檢測的詳細結果
     detections = results.pandas().xyxy[0]  # 將結果轉為 DataFrame
