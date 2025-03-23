@@ -12,6 +12,11 @@
 
 建立搜尋欄位，便於篩選利特定日期之影像。
 
+code：
+```bash=
+image_man.py
+```
+
 成果展示：
 ![圖片描述](photo/result_Im.png)
 
@@ -20,10 +25,29 @@
 由老師編寫的爬蟲程式。
 從法規資料庫中，爬取法規，存入資料庫中。
 
+code：
+```bash=
+# 連接資料庫
+db_utils.py
+
+# 爬蟲
+scraper.py
+```
 ## LLM問答系統 - Laws_LLM
 
 爬取法規資料庫中的法規條文，並存入資料庫中。
 運用虛假的影像資訊，讓AI根據資料庫內容進行違規法條判斷。
+
+```bash=
+# 連接資料庫
+db_utils.py
+
+# 爬蟲
+scraper.py
+
+# LLM
+AI_assisant.py
+```
 
 成果展示：
 ![圖片描述](photo/result_LLM.png)
