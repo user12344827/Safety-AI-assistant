@@ -3,11 +3,17 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
 import json
 from AI_assisant import chat
+from dotenv import load_dotenv
+import os
+
+# 載入環境變數
+load_dotenv()
 
 app = Flask(__name__)
 
-CHANNEL_SECRET = "cce6ba895f5d666f5f80573c5d5a2985"
-CHANNEL_ACCESS_TOKEN = "arjFaYSIko0DltLyFb1EDbfUlx8000vNL0XD6KGQsGkNM5/uQL5GhaB+9D+J6TpcuozluKK7V95Qb/RvjJ1EXwu7+WttmFoM2vZbTbrapDBoHgMWiogW4Dxep4zeKhVFnN0Hg2yQrv/qtXZnKeDrjwdB04t89/1O/w1cDnyilFU="
+# 從環境變數獲取設定
+CHANNEL_SECRET = os.getenv("CHANNEL_SECRET")
+CHANNEL_ACCESS_TOKEN = os.getenv("CHANNEL_ACCESS_TOKEN")
 
 @app.route("/", methods=['POST'])
 def linebot():
@@ -21,8 +27,8 @@ def linebot():
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']         # 取得 reply token
         msg = json_data['events'][0]['message']['text']   # 取得使用者發送的訊息
-        text_message = TextSendMessage(text = chat(msg))#TextSendMessage(text=msg)          # 設定回傳同樣的訊息
-        # text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+        # text_message = TextSendMessage(text = chat(msg))#TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+        text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
 
         line_bot_api.reply_message(tk,text_message)       # 回傳訊息
     except Exception as e:
