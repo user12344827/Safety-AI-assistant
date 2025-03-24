@@ -102,4 +102,4 @@ if __name__ == "__main__":
     chapters = set(item['chapter'] for item in laws_data if item['chapter'])
     print("\nChapters found:")
     for chapter in sorted(chapters):
-        print(f"- {chapter}")dd
+        print(f"- {chapter}")

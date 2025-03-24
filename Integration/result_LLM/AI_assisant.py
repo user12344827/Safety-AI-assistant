@@ -2,7 +2,7 @@ import json
 import os
 import openai
 from dotenv import load_dotenv
-from langchain.sql_database import SQLDatabase
+from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import ChatPromptTemplate
@@ -15,7 +15,7 @@ db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
 db_host = os.getenv("DB_HOST")
 db_name = os.getenv("DB_NAME")
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("AKASH_API_KEY")
 
 # 初始化資料庫、LLM
 def init_db_and_llm():
@@ -37,24 +37,37 @@ def init_db_and_llm():
     # 初始化 LLM
     llm = ChatOpenAI(
         temperature=0.7,
-        model_name="gpt-4",
-        openai_api_key=api_key
+        model="DeepSeek-R1",
+        openai_api_key=api_key,
+        base_url="https://chatapi.akash.network/api/v1"
     )
     
     return db, llm
 
 # 原有的 OpenAI 聊天函數
 def general_chat(text):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    completion = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": text}
-        ]
+    akash.api_key = os.getenv("AKASH_API_KEY")
+    
+    # 初始化 OpenAI 客戶端，但指定 Akash 的基礎 URL
+    client = openai.OpenAI(
+        api_key=akash_api_key,
+        base_url="https://chatapi.akash.network/api/v1"
     )
     
-    print(completion)
-    return completion.choices[0].message.content
+    # 建立聊天請求
+    try:
+        response = client.chat.completions.create(
+            model="DeepSeek-R1",  # 或其他 Akash 支援的模型，如 "Meta-Llama-3-1-8B-Instruct-FP8"
+            messages=[
+                {"role": "user", "content": text}
+            ]
+        )
+        
+        print(response)
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Akash API 錯誤: {e}")
+        return f"系統錯誤: {e}"
 
 # 工地安全法規分析函數
 def safety_analysis(text):
