@@ -27,8 +27,8 @@ def linebot():
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']         # 取得 reply token
         msg = json_data['events'][0]['message']['text']   # 取得使用者發送的訊息
-        # text_message = TextSendMessage(text = chat(msg))#TextSendMessage(text=msg)          # 設定回傳同樣的訊息
-        text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+        text_message = TextSendMessage(text = chat(msg))  # 設定回傳同樣的訊息
+        # text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
 
         line_bot_api.reply_message(tk,text_message)       # 回傳訊息
     except Exception as e:
