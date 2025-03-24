@@ -1,18 +1,22 @@
 import pymysql
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def connect_to_db():
     return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="ntC1234#31#",
-        db="workshop_law"
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        db=os.getenv("DB_NAME")
     )
 
 def drop_and_create_db():
     conn = pymysql.connect(
-        host="localhost",
-        user="root",
-        password="ntC1234#31#"
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD")
     )
     cur = conn.cursor()
 

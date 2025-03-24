@@ -54,3 +54,6 @@ AI_assisant.py
 ![圖片描述](photo/result_LLM.png)
 
 ## 影像處理 - Laws_mech
+
+
+ngrok 串接LineBot
